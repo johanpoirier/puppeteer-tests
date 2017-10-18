@@ -1,0 +1,120 @@
+const expect = require('chai').expect;
+const puppeteer = require('puppeteer');
+
+const DEFAULT_TIMEOUT = 10000; // ms
+
+describe('Web store', function () {
+  this.timeout(DEFAULT_TIMEOUT);
+
+  let page, browser;
+
+  before(async function () {
+    browser = await puppeteer.launch();
+    page = await browser.newPage();
+
+    await page.setRequestInterceptionEnabled(true);
+    page.on('request', interceptedRequest => {
+      if (interceptedRequest.url.indexOf('www.google-analytics.com') > 0) {
+        interceptedRequest.abort();
+      }
+      else {
+        interceptedRequest.continue();
+      }
+    });
+
+    await page.goto('https://ebook.la-croix.com/', { waitUntil: 'networkidle' });
+  });
+
+  after(async function () {
+    await browser.close();
+  });
+
+  describe('Homepage', () => {
+    it('should have a welcome text', async () => {
+      const text = await page.plainText();
+      expect(text.search('Bienvenue sur la librairie')).to.be.at.least(0);
+    });
+
+    it('should have at least 8 covers', async () => {
+      const coversCount = await page.evaluate(() => {
+        const coverElements = Array.from(document.querySelectorAll('.product-img img'));
+        return coverElements.length;
+      });
+      expect(coversCount).to.be.at.least(8);
+    });
+
+    it('should have a thesaurus', async () => {
+      const thesaurusCount = await page.evaluate(() => {
+        const thesaurusElements = Array.from(document.querySelectorAll('.sidebar li'));
+        return thesaurusElements.length;
+      });
+      expect(thesaurusCount).to.be.at.least(40);
+    });
+
+  });
+
+
+  describe('Login', function () {
+    it('should have a cart element', () => {
+      return page.waitForSelector('.mon_panier')
+        .then(async () => {
+          const text = await page.plainText();
+          expect(text.search('Vous connecter') !== -1).to.be.true;
+        })
+        .catch(error => {
+          console.error(error);
+          throw new Error('Cart has not been found');
+        });
+    });
+
+    it('should log in', async () => {
+      await page.click('a[title="Vous connecter"]');
+      await page.waitForSelector('#login-form');
+
+      await page.focus('input[name="login[username]"]');
+      await page.type('tests@tea-ebook.com');
+
+      await page.focus('input[name="login[password]"]');
+      await page.type('i]3j7a-o2ksBiDp-=XV++!saS');
+
+      const loginForm = await page.$("#login-form");
+      await page.evaluate(loginForm => loginForm.submit(), loginForm);
+
+      return page.waitForSelector('.block-account')
+        .then(async () => {
+          const text = await page.plainText();
+          expect(text.search('Vos informations personnelles') !== -1).to.be.true;
+        })
+        .catch(error => {
+          console.error(error);
+          throw new Error('User personal space has not been found');
+        });
+     });
+  });
+
+  describe('Cart', function () {
+    it ('should have a clean cart', async () => {
+      await page.waitForSelector('#top-cart a');
+
+      const cartLabel = await page.evaluate(() => document.querySelector('#top-cart a').innerHTML);
+      const itemCount = /(\d)+/i.exec(cartLabel)[0];
+
+      await page.click('#top-cart a');
+
+      if (itemCount > 0) {
+        await page.waitForSelector('.tab_cart');
+
+        for (let i = 0; i < itemCount; i++) {
+          //await page.screenshot({ path: `cart-${i}.png`, fullPage: true });
+          await page.click('.td_del a');
+          await page.waitForNavigation();
+        }
+      }
+
+      await page.waitForSelector('.title_tunnel_step');
+
+      const text = await page.plainText();
+      expect(text.search('Votre panier est vide') !== -1).to.be.true;
+    });
+  });
+});
