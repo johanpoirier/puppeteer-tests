@@ -1,6 +1,8 @@
 const expect = require('chai').expect;
 const puppeteer = require('puppeteer');
 
+const config = require(`${__dirname}/../../config/stores/web.json`);
+
 const DEFAULT_TIMEOUT = 10000; // ms
 
 describe('Web store', function () {
@@ -22,7 +24,7 @@ describe('Web store', function () {
       }
     });
 
-    await page.goto('https://ebook.la-croix.com/', { waitUntil: 'networkidle' });
+    await page.goto(config.url, { waitUntil: 'networkidle' });
   });
 
   after(async function () {
@@ -72,10 +74,10 @@ describe('Web store', function () {
       await page.waitForSelector('#login-form');
 
       await page.focus('input[name="login[username]"]');
-      await page.type('tests@tea-ebook.com');
+      await page.type(config.login);
 
       await page.focus('input[name="login[password]"]');
-      await page.type('i]3j7a-o2ksBiDp-=XV++!saS');
+      await page.type(config.password);
 
       const loginForm = await page.$("#login-form");
       await page.evaluate(loginForm => loginForm.submit(), loginForm);
