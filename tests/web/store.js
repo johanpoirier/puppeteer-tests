@@ -1,9 +1,10 @@
 const expect = require('chai').expect;
 const puppeteer = require('puppeteer');
 
-const config = require(`${__dirname}/../../config/stores/web.json`);
+const config = require(`${__dirname}/../../config/stores/web.json`).store;
 
 const DEFAULT_TIMEOUT = 10000; // ms
+const DEBUG = false;
 
 describe('Web store', function () {
   this.timeout(DEFAULT_TIMEOUT);
@@ -11,12 +12,12 @@ describe('Web store', function () {
   let page, browser;
 
   before(async function () {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({ headless: !DEBUG });
     page = await browser.newPage();
 
-    await page.setRequestInterceptionEnabled(true);
+    await page.setRequestInterception(true);
     page.on('request', interceptedRequest => {
-      if (interceptedRequest.url.indexOf('www.google-analytics.com') > 0) {
+      if (interceptedRequest.url().indexOf('www.google-analytics.com') > 0) {
         interceptedRequest.abort();
       }
       else {
@@ -24,7 +25,7 @@ describe('Web store', function () {
       }
     });
 
-    await page.goto(config.url, { waitUntil: 'networkidle' });
+    await page.goto(config.url, { waitUntil: 'networkidle0' });
   });
 
   after(async function () {
@@ -33,7 +34,7 @@ describe('Web store', function () {
 
   describe('Homepage', () => {
     it('should have a welcome text', async () => {
-      const text = await page.plainText();
+      const text = await page.content();
       expect(text.search('Bienvenue sur la librairie')).to.be.at.least(0);
     });
 
@@ -60,7 +61,7 @@ describe('Web store', function () {
     it('should have a cart element', () => {
       return page.waitForSelector('.mon_panier')
         .then(async () => {
-          const text = await page.plainText();
+          const text = await page.content();
           expect(text.search('Vous connecter') !== -1).to.be.true;
         })
         .catch(error => {
@@ -73,18 +74,15 @@ describe('Web store', function () {
       await page.click('a[title="Vous connecter"]');
       await page.waitForSelector('#login-form');
 
-      await page.focus('input[name="login[username]"]');
-      await page.type(config.login);
-
-      await page.focus('input[name="login[password]"]');
-      await page.type(config.password);
+      await page.type('input[name="login[username]"]', config.login);
+      await page.type('input[name="login[password]"]', config.password);
 
       const loginForm = await page.$("#login-form");
       await page.evaluate(loginForm => loginForm.submit(), loginForm);
 
       return page.waitForSelector('.block-account')
         .then(async () => {
-          const text = await page.plainText();
+          const text = await page.content();
           expect(text.search('Vos informations personnelles') !== -1).to.be.true;
         })
         .catch(error => {
@@ -115,7 +113,7 @@ describe('Web store', function () {
 
       await page.waitForSelector('.title_tunnel_step');
 
-      const text = await page.plainText();
+      const text = await page.content();
       expect(text.search('Votre panier est vide') !== -1).to.be.true;
     });
   });

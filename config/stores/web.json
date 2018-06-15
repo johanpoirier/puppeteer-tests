@@ -1,6 +1,14 @@
 {
-  "name": "Plop",
-  "url": "https://ebook.plop.com/",
-  "login": "login",
-  "password": "password"
+  "store": {
+    "name": "Plop",
+    "url": "https://ebook.plop.com/",
+    "login": "login",
+    "password": "password"
+  },
+  "ereader": {
+    "name": "Plap",
+    "url": "https://ebook.plap.com/",
+    "login": "login",
+    "password": "password"
+  }
 }

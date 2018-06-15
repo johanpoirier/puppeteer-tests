@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 (async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto('https://ebook.chapitre.com', { waitUntil: 'networkidle' });
+  await page.goto('https://ebook.chapitre.com', { waitUntil: 'networkidle0' });
   const nbCovers = await page.evaluate(() => {
     const coverElements = Array.from(document.querySelectorAll('.product-img img'));
     return coverElements.length;
