@@ -1,3 +1,5 @@
 node_modules/
 .idea/
 config/stores/*.prod.json
+screenshots/*.png
+*.vivlio.js

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        body {
+            background-color: #000000;
+            color: #dedede;
+            font-family: Verdana, Geneva, sans-serif;
+            overflow: hidden;
+        }
+
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100vw;
+        }
+
+        .grid img {
+            width: 12.5%;
+        }
+    </style>
+    <title>Ecommerce</title>
+</head>
+<body>
+<div class="grid"></div>
+<script type="text/javascript">
+    const images = [
+        'ereader_chapitre.png',
+        'ereader_cheminant.png',
+        'ereader_cnam.png',
+        'ereader_cultura.png',
+        'ereader_decitre.png',
+        'ereader_develay.png',
+        'ereader_ebooks-store.png',
+        'ereader_espacetemps.png',
+        'ereader_franceloisirs.png',
+        'ereader_furet.png',
+        'ereader_montbarbon.png',
+        'ereader_planetr.png',
+        'ereader_systeme-u.png',
+        'ereader_vivlio.png',
+        'web_bisey.png',
+        'web_chapitre.png',
+        'web_cnam.png',
+        'web_develay.png',
+        'web_ebooks-store.png',
+        'web_esmod.png',
+        'web_espacetemps.png',
+        'web_franceloisirs.png',
+        'web_furet.png',
+        'web_jaimelirestore.png',
+        'web_la-croix.png',
+        'web_librairie-jesuite.png',
+        'web_lizzie.png',
+        'web_monlibrairenumerique.png',
+        'web_montbarbon.png',
+        'web_planetr.png',
+        'web_vivlio.png'
+    ];
+    window.onload = function () {
+        const grid = document.querySelector('.grid');
+        images.forEach(image => {
+            const img = document.createElement('img');
+            img.src = `screenshots/${image}`;
+            grid.appendChild(img);
+        });
+    };
+
+    window.setInterval(() => window.location.reload(true), 60000);
+</script>
+</body>
+</html>
