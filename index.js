@@ -51,14 +51,14 @@ async function screenshot(page, websites) {
 
         if (website.type === 'ereader') {
             await page.click('.buy');
-            await page.waitForSelector('.cart-confirm-msg');
+            await page.waitForSelector('.cart-confirm-msg', {timeout: 60000});
             await page.click('.cart-confirm-msg a.main');
             await page.waitForSelector('#co_step_1');
         } else {
             await page.click('#button_add_to_cart');
-            await page.waitForSelector('a.btn-primary[href="/checkout/cart"]');
+            await page.waitForSelector('a.btn-primary[href="/checkout/cart"]', {timeout: 60000});
             await page.click('a.btn-primary[href="/checkout/cart"]');
-            await page.waitForSelector('#shopping-breadcrumbs-1');
+            await page.waitForSelector('#shopping-breadcrumbs-1', {timeout: 60000});
         }
 
         await page.screenshot({path: `${__dirname}/screenshots/${website.type}_${website.name}_cart.png`});
