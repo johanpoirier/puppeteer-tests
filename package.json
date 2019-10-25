@@ -12,6 +12,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node index.js",
     "test": "mocha --require babel-register tests/web/"
   },
   "author": "Johan Poirier <jpoirier@tea-ebook.com>",
