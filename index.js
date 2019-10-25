@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const websites = require('./websites');
 const tools = require('./tools');
 
