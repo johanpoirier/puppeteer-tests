@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const puppeteer = require('puppeteer');
+const tools = require(`${__dirname}/tools`);
 
 const config = require(`${__dirname}/../../config/stores/web.json`).store;
 
@@ -14,17 +15,7 @@ describe('Web store', function () {
   before(async function () {
     browser = await puppeteer.launch({ headless: !DEBUG });
     page = await browser.newPage();
-
-    await page.setRequestInterception(true);
-    page.on('request', interceptedRequest => {
-      if (interceptedRequest.url().indexOf('www.google-analytics.com') > 0) {
-        interceptedRequest.abort();
-      }
-      else {
-        interceptedRequest.continue();
-      }
-    });
-
+    await tools.ignoreGa(page);
     await page.goto(config.url, { waitUntil: 'networkidle0' });
   });
 
